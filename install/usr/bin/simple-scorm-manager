@@ -96,11 +96,13 @@ case "$1" in
    ;;
    play)
       shift
+      FILE_TO_USE=$(echo $@| sed -e "s% %\ %g")
+      echo "$FILE_TO_USE"
       mkdir -p "$TMP_BASEDIR"
       TMP_DIR="$(mktemp -d -tp "$TMP_BASEDIR")"
-      [ "$1" -a -r "$1" ] || die "Invalid ZIP file"
-      unzip "$1" -d "$TMP_DIR" >/dev/null 2>/dev/null || die "Error extracting files"
-      RES_TITLE="$(basename $1 ".zip")"
+      [ "$FILE_TO_USE" -a -r "$FILE_TO_USE" ] || die "Invalid ZIP file"
+      unzip "$FILE_TO_USE" -d "$TMP_DIR" >/dev/null 2>/dev/null || die "Error extracting files"
+      RES_TITLE="$(basename "$FILE_TO_USE"".zip")"
       parse_xml_data || die "Unable to read imsmanifest.xml"
 
       NUM_TARGETS=${#RES_FILE[@]}
