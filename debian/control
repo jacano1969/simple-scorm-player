@@ -1,7 +1,7 @@
 Source: simple-scorm-player
 Section: x11
 Priority: extra
-Maintainer: Angel Berlanas Vicente  <angel.berlanas@gmail.com>
+Maintainer: Angel Berlanas Vicente <angel.berlanas@gmail.com>
 Build-Depends: debhelper (>= 7) 
 Standards-Version: 3.9.3
 XS-Python-Version: current
