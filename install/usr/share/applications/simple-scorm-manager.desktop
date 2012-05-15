@@ -1,0 +1,20 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Simple SCORM player
+Name[en]=Simple SCORM player
+Name[es]=Visor de SCORM
+Name[qcv]=Visualitzador d'SCORM
+GenericName=SCORM files visualizator
+GenericName[en]=SCORM files visualizator
+GenericName[es]=Visor interactivo de ficheros SCORM
+GenericName[qcv]=Visualitzador interactiu de fitxers d'SCORM
+Comment=SCORM files visualizator
+Comment[en]=SCORM files visualizator
+Comment[es]=Visor interactivo de ficheros SCORM
+Comment[qcv]=Visualitzador interactiu de fitxers d'SCORM
+Icon=application-scorm
+Exec=simple-scorm-manager gui
+Terminal=false
+StartupNotify=false
+Categories=Application;Education

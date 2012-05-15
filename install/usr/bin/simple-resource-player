@@ -1,0 +1,6 @@
+#!/bin/sh
+[ "$1" ] || exit 0
+if file "$1" |grep -q "Macromedia Flash" ; then
+   exec x-www-browser "$@"
+fi
+exec xdg-open "$@"

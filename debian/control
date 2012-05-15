@@ -1,0 +1,14 @@
+Source: simple-scorm-player
+Section: x11
+Priority: extra
+Maintainer: Angel Berlanas Vicente  <angel.berlanas@gmail.com>
+Build-Depends: debhelper (>= 7) 
+Standards-Version: 3.9.3
+XS-Python-Version: current
+
+Package: simple-scorm-player
+Architecture: any
+Depends: ${misc:Depends},unzip, xdg-utils, firefox | www-browser, gconf2, nautilus
+Description: Simple player for SCORM resources
+ Simple-scorm-player is a simple player, to resolve the SCORM
+ question.

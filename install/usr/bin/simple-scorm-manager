@@ -1,0 +1,128 @@
+#!/bin/bash
+# Based on the code of lliurex-scorm-manager
+# Adapted only to the current situation
+# -------
+# File:        lliurex-scorm-manager
+# Description: Simple scorm manager (web/flash content only)
+# Author:      Luis Garcia Gisbert <garcia_luigis@gva.es>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin St, Fifth Floor, Boston MA 02110-1301 USA
+# --------
+
+set -e
+
+PATH="/usr/sbin:/usr/bin:/sbin:/bin"
+
+
+declare -a RES_NAME
+declare -a RES_FILE
+TMP_BASEDIR="/tmp/simple-scorm-recursos-$LOGNAME"
+TMP_DIR=""
+TMP_FILE=""
+RES_TITLE=""
+
+show_array(){
+   j=0
+   while [ $j -lt $NUM_TARGETS ] ; do
+      printf "${RES_NAME[$j]}"
+      echo -ne "\0000"
+      printf "${RES_FILE[$j]}"
+      echo -ne "\0000"
+      j=$(($j +1))
+   done
+}
+
+show_targets(){
+   ZR=0
+   show_array |xargs -0 zenity --list --column " " --column file --print-column="2" --hide-column="2" || ZR=$?
+   return $ZR
+}
+
+remove_tmp(){
+   [ -z "$TMP_FILE" ] || rm -f "$TMP_FILE"
+   # [ -z "$TMP_DIR" ] || rm -rf "$TMP_DIR"
+}
+
+die(){
+   echo -e "$@" >&2
+   remove_tmp
+   exit 1
+}
+
+parse_xml_data(){
+   XML_FILE="$TMP_DIR/imsmanifest.xml"
+   [ -r "$XML_FILE" ] || return 1
+   TMP_FILE="$(tempfile)"
+   sed -e "s%>%\n>\n%g;s%<%\n<%g" "$XML_FILE" > "$TMP_FILE"
+   RESOURCE_REGEXP="<resource identifier="
+   FILE_REGEXP="href="
+   RES_LIST="$(sed -ne "/$RESOURCE_REGEXP/{s%^.*$RESOURCE_REGEXP%%;s%[[:blank:]]\+.*$%%;p}" "$TMP_FILE")"
+   n=0
+   for R in $RES_LIST ; do
+      RES_BASEFILE="$(sed -ne "/$RESOURCE_REGEXP$R/,/>/{/$FILE_REGEXP/{s%^.*$FILE_REGEXP%%;s%>.*$%%;s%\"%%g;p}}" "$TMP_FILE")"
+      if [ "$RES_BASEFILE" ] ; then
+         RES_NAME[$n]="$RES_TITLE $n ($(basename "$RES_BASEFILE"))"
+         RES_FILE[$n]="$TMP_DIR/$RES_BASEFILE"
+         n=$(($n + 1))
+      fi
+   done
+   rm -f "$TMP_FILE"
+}
+
+# main
+rc=0
+
+case "$1" in
+    gui)
+        FILE_TO_SCORM="$(zenity --file-selection)"
+        echo "$0 play $FILE_TO_SCORM" >> /tmp/angel.log
+        "$0" play "$FILE_TO_SCORM"
+    ;;
+
+   clean)
+      rm -fr "$TMP_BASEDIR"
+   ;;
+   play)
+      shift
+      mkdir -p "$TMP_BASEDIR"
+      TMP_DIR="$(mktemp -d -tp "$TMP_BASEDIR")"
+      [ "$1" -a -r "$1" ] || die "Invalid ZIP file"
+      unzip "$1" -d "$TMP_DIR" >/dev/null 2>/dev/null || die "Error extracting files"
+      RES_TITLE="$(basename $1 ".zip")"
+      parse_xml_data || die "Unable to read imsmanifest.xml"
+
+      NUM_TARGETS=${#RES_FILE[@]}
+      TARGET_FILE=""
+
+      if [ $NUM_TARGETS -gt 1 ] ; then
+         # multiple targets
+         TARGET_FILE="$(show_targets)" || die "Aborted"
+      elif [ $NUM_TARGETS -eq 1 ] ; then
+         TARGET_FILE="${RES_FILE[0]}"
+      fi
+
+      if [ "$TARGET_FILE" ] ; then
+         echo $TARGET_FILE
+         exec simple-resource-player "$TARGET_FILE"
+      fi
+      remove_tmp
+   ;;
+   *)
+      die "$(basename $0) play <ZIPFILE>\n$(basename $0) clean" >&2
+   ;;
+esac
+exit $rc
+
+
