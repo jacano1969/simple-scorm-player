@@ -6,5 +6,7 @@ the index.html with firefox or other www-browser.
 
 It is a very useful solution with no *web-server* requeriments.
 
+Anothers SCORM players need some dependences:
 
+*TOMCAT or another web applicattion server    
 
