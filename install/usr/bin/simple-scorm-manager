@@ -56,7 +56,7 @@ remove_tmp(){
 }
 
 die(){
-   echo -e "$@" >&2
+   echo -e "[ERROR] $@" >&2
    remove_tmp
    exit 1
 }
@@ -96,7 +96,7 @@ case "$1" in
    play)
       shift
       FILE_TO_USE=$(echo $@| sed -e "s% %\ %g")
-      echo "$FILE_TO_USE"
+      echo "[DEBUG]: File is $TARGET_FILE"
       mkdir -p "$TMP_BASEDIR"
       TMP_DIR="$(mktemp -d -tp "$TMP_BASEDIR")"
       [ "$FILE_TO_USE" -a -r "$FILE_TO_USE" ] || die "Invalid ZIP file"
