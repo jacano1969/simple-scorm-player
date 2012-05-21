@@ -8,5 +8,6 @@ It is a very useful solution with no *web-server* requeriments.
 
 Anothers SCORM players need some dependences:
 
-*TOMCAT or another web applicattion server    
+* TOMCAT or another web applicattion server 
+* Apache or another web server   
 
