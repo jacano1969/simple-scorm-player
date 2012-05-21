@@ -87,7 +87,6 @@ rc=0
 case "$1" in
     gui)
         FILE_TO_SCORM="$(zenity --file-selection)"
-        echo "$0 play $FILE_TO_SCORM" >> /tmp/angel.log
         "$0" play "$FILE_TO_SCORM"
     ;;
 
@@ -116,7 +115,7 @@ case "$1" in
       fi
 
       if [ "$TARGET_FILE" ] ; then
-         echo $TARGET_FILE
+         echo "[DEBUG]: File is $TARGET_FILE"
          exec simple-resource-player "$TARGET_FILE"
       fi
       remove_tmp
